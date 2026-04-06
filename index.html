@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Private Atelier | Luxury Jewelry</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
+
+    <style>
+        body { font-family: 'Playfair Display', serif; }
+        .font-serif { font-family: 'Playfair Display', serif; }
+        
+        /* Custom Animations */
+        @keyframes fade-in { from { opacity: 0; } to { opacity: 0.7; } }
+        @keyframes slide-up { from { opacity: 0; transform: translateY(50px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fade-up { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .animate-fade-in { animation: fade-in 2.5s ease-out forwards; }
+        .animate-slide-up { animation: slide-up 1.5s cubic-bezier(0.19, 1, 0.22, 1) forwards; }
+        .animate-fade-up { animation: fade-up 1s cubic-bezier(0.19, 1, 0.22, 1) forwards; }
+        
+        /* Scrollbar styling */
+        ::-webkit-scrollbar { width: 3px; }
+        ::-webkit-scrollbar-thumb { background: #000; }
+
+        /* Sidebar transition */
+        #sidebar { transition: transform 0.7s cubic-bezier(0.19, 1, 0.22, 1); }
+        .translate-x-full-custom { transform: translateX(-100%); }
+    </style>
+</head>
+<body class="bg-white text-black antialiased selection:bg-black selection:text-white">
+
+    <nav id="navbar" class="fixed top-0 w-full z-[90] transition-all duration-700 px-6 md:px-12 py-6 flex justify-between items-center bg-transparent">
+        <div class="flex-1">
+            <button onclick="toggleMenu(true)" class="flex items-center gap-3 text-[11px] tracking-[0.3em] uppercase font-bold group">
+                <i data-lucide="menu" class="w-5 h-5 transition-transform group-hover:scale-110"></i>
+                <span class="hidden md:block">Directory</span>
+            </button>
+        </div>
+        <div class="text-2xl md:text-3xl tracking-[0.6em] font-light uppercase text-center flex-1 cursor-pointer" onclick="filterCategory('All')">
+            [NAME]
+        </div>
+        <div class="flex-1 flex justify-end"></div>
+    </nav>
+
+    <div id="sidebar" class="fixed inset-0 z-[100] bg-white translate-x-full-custom">
+        <div class="p-8 flex justify-between items-center border-b border-stone-100">
+            <span class="text-[11px] tracking-[0.3em] uppercase font-bold text-stone-400">Navigation</span>
+            <i data-lucide="x" class="w-8 h-8 cursor-pointer hover:rotate-90 transition-transform" onclick="toggleMenu(false)"></i>
+        </div>
+        <div class="p-8 md:p-16 max-w-4xl mx-auto space-y-12">
+            <div class="relative group">
+                <i data-lucide="search" class="absolute left-0 top-1/2 -translate-y-1/2 w-6 h-6 text-stone-300"></i>
+                <input 
+                    type="text" 
+                    id="searchInput"
+                    placeholder="SEARCH..."
+                    oninput="handleSearch(this.value)"
+                    class="w-full bg-transparent border-b border-stone-200 py-6 pl-12 text-2xl font-light tracking-widest focus:outline-none focus:border-black transition-all uppercase"
+                >
+            </div>
+            <nav class="flex flex-col space-y-8">
+                <button onclick="filterCategory('All')" class="nav-link text-left text-4xl md:text-6xl font-light tracking-tighter text-black" data-cat="All">The Archive</button>
+                <button onclick="filterCategory('Matching Bracelets')" class="nav-link text-left text-3xl md:text-5xl font-light tracking-tighter text-stone-200" data-cat="Matching Bracelets">Matching Bracelets</button>
+                <button onclick="filterCategory('Custom Made Hampers')" class="nav-link text-left text-3xl md:text-5xl font-light tracking-tighter text-stone-200" data-cat="Custom Made Hampers">Custom Made Hampers</button>
+                <button onclick="filterCategory('Bracelets')" class="nav-link text-left text-3xl md:text-5xl font-light tracking-tighter text-stone-200" data-cat="Bracelets">Bracelets</button>
+            </nav>
+        </div>
+    </div>
+
+    <section class="relative h-screen flex items-center justify-center overflow-hidden bg-[#e8e8e8]">
+        <div class="absolute inset-0 bg-cover bg-center mix-blend-overlay opacity-40" style="background-image: url('https://images.unsplash.com/photo-1611085583191-a3b1a30a5a4a?auto=format&fit=crop&q=80&w=2000')"></div>
+        
+        <div id="pearlLens" class="absolute inset-0 z-0 pointer-events-none transition-opacity duration-500 flex items-center justify-center">
+            <div class="absolute w-[130vw] h-[130vw] bg-[radial-gradient(circle_at_center,_#FFFFFF_0%,_#F5F5F5_20%,_#E5E4E2_40%,_#D1D1D1_60%,_transparent_80%)] shadow-inner"></div>
+        </div>
+
+        <div class="relative z-10 text-center space-y-6">
+            <p class="text-[11px] uppercase tracking-[1.2em] font-bold text-black opacity-70 animate-fade-in">Maison Collection</p>
+            <h1 id="heroTitle" class="text-5xl md:text-[9rem] font-light tracking-tighter uppercase text-black leading-none select-none animate-slide-up">
+                Season
+            </h1>
+        </div>
+    </section>
+
+    <main id="mainContent" class="max-w-[1800px] mx-auto px-6 md:px-12 py-32 min-h-[60vh] flex flex-col justify-center">
+        </main>
+
+    <footer class="bg-white py-32 px-10 border-t border-stone-100 text-center">
+        <div class="text-3xl md:text-5xl tracking-[0.8em] font-light uppercase mb-8">[NAME]</div>
+        <p class="text-[10px] tracking-[0.5em] text-stone-300 uppercase">© 2024 Private Atelier</p>
+    </footer>
+
+    <script>
+        // --- DATA ---
+        const MATCHING_BRACELETS = Array.from({ length: 30 }, (_, i) => ({
+            id: `mb-${i}`,
+            category: "Matching Bracelets",
+            name: `Matching Duo No. ${i + 1}`,
+            price: 1850,
+            img: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='750'%3E%3Crect width='600' height='750' fill='%23D1D1D1'/%3E%3C/svg%3E"
+        }));
+
+        const BRACELET_COLLECTION = Array.from({ length: 12 }, (_, i) => ({
+            id: `br-${i}`,
+            category: "Bracelets",
+            name: `Lumière Cuff ${String.fromCharCode(65 + i)}`,
+            price: 1250,
+            img: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='750'%3E%3Crect width='600' height='750' fill='%23E5E4E2'/%3E%3C/svg%3E"
+        }));
+
+        const MASTER_COLLECTION = [...MATCHING_BRACELETS, ...BRACELET_COLLECTION];
+        let currentCategory = 'All';
+        let currentSearch = '';
+
+        // --- CORE FUNCTIONS ---
+        function init() {
+            lucide.createIcons();
+            renderProducts();
+            
+            window.addEventListener('scroll', () => {
+                const scroll = window.scrollY;
+                const nav = document.getElementById('navbar');
+                const lens = document.getElementById('pearlLens');
+
+                // Navbar scroll effect
+                if (scroll > 50) {
+                    nav.classList.add('bg-white', 'border-b', 'border-stone-200', 'py-4', 'shadow-md');
+                    nav.classList.remove('bg-transparent', 'py-6');
+                } else {
+                    nav.classList.remove('bg-white', 'border-b', 'border-stone-200', 'py-4', 'shadow-md');
+                    nav.classList.add('bg-transparent', 'py-6');
+                }
+
+                // Lens opacity
+                lens.style.opacity = Math.max(0, 1 - scroll / 600);
+            });
+        }
+
+        function toggleMenu(open) {
+            const sidebar = document.getElementById('sidebar');
+            if (open) {
+                sidebar.classList.remove('translate-x-full-custom');
+            } else {
+                sidebar.classList.add('translate-x-full-custom');
+            }
+        }
+
+        function handleSearch(val) {
+            currentSearch = val.toLowerCase();
+            renderProducts();
+        }
+
+        function filterCategory(cat) {
+            currentCategory = cat;
+            toggleMenu(false);
+            
+            // Update UI Active State
+            document.querySelectorAll('.nav-link').forEach(el => {
+                if (el.getAttribute('data-cat') === cat) {
+                    el.classList.add('text-black');
+                    el.classList.remove('text-stone-200');
+                } else {
+                    el.classList.remove('text-black');
+                    el.classList.add('text-stone-200');
+                }
+            });
+
+            // Update Hero Title
+            document.getElementById('heroTitle').innerText = cat === 'All' ? 'Season' : cat;
+            
+            renderProducts();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function handleInquiryEmail() {
+            const email = "somboudy@gmail.com";
+            const subject = encodeURIComponent("Custom Made Hamper Inquiry");
+            const body = encodeURIComponent("Hello, I am interested in ordering a custom made hamper. Please let me know the options available.");
+            window.location.href = `mailto:${email}?subject=${subject}&body=${body}`;
+        }
+
+        function renderProducts() {
+            const container = document.getElementById('mainContent');
+            
+            if (currentCategory === "Custom Made Hampers") {
+                container.innerHTML = `
+                    <div class="flex flex-col items-center justify-center space-y-12 animate-fade-up">
+                        <div class="text-center space-y-6 max-w-2xl">
+                            <h2 class="text-4xl font-light tracking-tighter uppercase">Tailored Perfection</h2>
+                            <p class="text-stone-500 text-sm tracking-widest leading-loose uppercase">
+                                Discover the art of bespoke gifting. Each hamper is uniquely curated to reflect your aesthetic and occasion.
+                            </p>
+                        </div>
+                        <button onclick="handleInquiryEmail()" class="bg-black text-white px-12 py-6 text-[11px] tracking-[0.4em] font-bold uppercase flex items-center gap-4 hover:bg-stone-800 transition-all shadow-2xl transform hover:scale-105 active:scale-95">
+                            <i data-lucide="mail" class="w-5 h-5"></i> Contact for Custom Made Hampers
+                        </button>
+                    </div>
+                `;
+            } else {
+                let filtered = MASTER_COLLECTION.filter(p => {
+                    const matchesCat = currentCategory === 'All' || p.category === currentCategory;
+                    const matchesSearch = p.name.toLowerCase().includes(currentSearch);
+                    return matchesCat && matchesSearch;
+                });
+
+                let html = `<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-x-12 gap-y-28">`;
+                
+                filtered.forEach(p => {
+                    html += `
+                        <div class="group cursor-pointer animate-fade-up">
+                            <div class="relative aspect-[4/5] bg-stone-100 overflow-hidden mb-8 transition-all duration-700 group-hover:shadow-xl">
+                                <img src="${p.img}" alt="${p.name}" class="w-full h-full object-cover transition-all duration-[1s] group-hover:scale-110" />
+                            </div>
+                            <div class="text-center space-y-2">
+                                <h3 class="text-[11px] uppercase tracking-[0.4em] font-bold text-black">${p.name}</h3>
+                                <p class="text-[12px] font-sans text-stone-400 tracking-widest uppercase">₹${p.price.toLocaleString('en-IN')}</p>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                html += `</div>`;
+                container.innerHTML = html;
+            }
+            lucide.createIcons(); // Re-render icons for new elements
+        }
+
+        // Run on load
+        window.onload = init;
+    </script>
+</body>
+</html>
