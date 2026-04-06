@@ -1,0 +1,186 @@
+import React, { useState, useMemo, useEffect } from 'react';
+import { Menu, X, Search, Mail } from 'lucide-react';
+
+// --- CONFIGURATION ---
+const STORE_NAME = "[NAME]";
+const DEHRADUN_ADDRESS = "124 Rajpur Road, Near Jakhan, Dehradun, Uttarakhand 248001";
+const HERO_IMAGE = "https://images.unsplash.com/photo-1611085583191-a3b1a30a5a4a?auto=format&fit=crop&q=80&w=2000";
+const TARGET_EMAIL = "somboudy@gmail.com";
+
+// --- COLLECTIONS ---
+
+// 30 Items for Matching Bracelets
+const MATCHING_BRACELETS = Array.from({ length: 30 }, (_, i) => ({
+  id: `mb-${i}`,
+  category: "Matching Bracelets",
+  name: `Matching Duo No. ${i + 1}`,
+  price: 1850,
+  img: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='750'%3E%3Crect width='600' height='750' fill='%23D1D1D1'/%3E%3C/svg%3E"
+}));
+
+const BRACELET_COLLECTION = Array.from({ length: 12 }, (_, i) => ({
+  id: `br-${i}`,
+  category: "Bracelets",
+  name: `Lumière Cuff ${String.fromCharCode(65 + i)}`,
+  price: 1250,
+  img: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='750'%3E%3Crect width='600' height='750' fill='%23E5E4E2'/%3E%3C/svg%3E"
+}));
+
+const MASTER_COLLECTION = [...MATCHING_BRACELETS, ...BRACELET_COLLECTION];
+const CATEGORIES = ["Matching Bracelets", "Custom Made Hampers", "Bracelets"];
+
+const App = () => {
+  const [activeCategory, setActiveCategory] = useState('All');
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [scrollProgress, setScrollProgress] = useState(0);
+
+  useEffect(() => {
+    const handleScroll = () => setScrollProgress(window.scrollY);
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  const displayProducts = useMemo(() => {
+    let filtered = MASTER_COLLECTION;
+    if (activeCategory !== 'All') {
+      filtered = filtered.filter(p => p.category === activeCategory);
+    }
+    if (searchQuery.trim() !== '') {
+      filtered = filtered.filter(p => p.name.toLowerCase().includes(searchQuery.toLowerCase()));
+    }
+    return filtered;
+  }, [activeCategory, searchQuery]);
+
+  const handleInquiryEmail = (e) => {
+    e.preventDefault();
+    const subject = encodeURIComponent("Custom Made Hamper Inquiry");
+    const body = encodeURIComponent("Hello, I am interested in ordering a custom made hamper. Please let me know the options available.");
+    window.location.href = `mailto:${TARGET_EMAIL}?subject=${subject}&body=${body}`;
+  };
+
+  const lensOpacity = Math.max(0, 1 - scrollProgress / 600);
+
+  return (
+    <div className="min-h-screen bg-white text-black font-serif antialiased selection:bg-black selection:text-white">
+      
+      {/* NAVIGATION */}
+      <nav className={`fixed top-0 w-full z-[90] transition-all duration-700 px-6 md:px-12 py-6 flex justify-between items-center ${
+        scrollProgress > 50 ? 'bg-white border-b border-stone-200 py-4 shadow-md' : 'bg-transparent'
+      }`}>
+        <div className="flex-1">
+          <button onClick={() => setIsMenuOpen(true)} className="flex items-center gap-3 text-[11px] tracking-[0.3em] uppercase font-bold group">
+            <Menu className="w-5 h-5 transition-transform group-hover:scale-110" />
+            <span className="hidden md:block">Directory</span>
+          </button>
+        </div>
+        <div className="text-2xl md:text-3xl tracking-[0.6em] font-light uppercase text-center flex-1 cursor-pointer" onClick={() => { setActiveCategory('All'); window.scrollTo({top:0, behavior:'smooth'}); }}>
+          {STORE_NAME}
+        </div>
+        <div className="flex-1 flex justify-end" />
+      </nav>
+
+      {/* SIDEBAR SEARCH */}
+      <div className={`fixed inset-0 z-[100] bg-white transition-transform duration-700 ease-[cubic-bezier(0.19,1,0.22,1)] ${
+        isMenuOpen ? 'translate-x-0' : '-translate-x-full'
+      }`}>
+        <div className="p-8 flex justify-between items-center border-b border-stone-100">
+          <span className="text-[11px] tracking-[0.3em] uppercase font-bold text-stone-400">Navigation</span>
+          <X className="w-8 h-8 cursor-pointer hover:rotate-90 transition-transform" onClick={() => setIsMenuOpen(false)} />
+        </div>
+        <div className="p-8 md:p-16 max-w-4xl mx-auto space-y-12">
+          <div className="relative group">
+            <Search className="absolute left-0 top-1/2 -translate-y-1/2 w-6 h-6 text-stone-300" />
+            <input 
+              type="text" 
+              placeholder="SEARCH..."
+              className="w-full bg-transparent border-b border-stone-200 py-6 pl-12 text-2xl font-light tracking-widest focus:outline-none focus:border-black transition-all uppercase"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
+          <nav className="flex flex-col space-y-8">
+            <button onClick={() => { setActiveCategory('All'); setIsMenuOpen(false); }} className={`text-left text-4xl md:text-6xl font-light tracking-tighter ${activeCategory === 'All' ? 'text-black' : 'text-stone-200'}`}>The Archive</button>
+            {CATEGORIES.map(cat => (
+              <button key={cat} onClick={() => { setActiveCategory(cat); setIsMenuOpen(false); }} className={`text-left text-3xl md:text-5xl font-light tracking-tighter ${activeCategory === cat ? 'text-black' : 'text-stone-200'}`}>{cat}</button>
+            ))}
+          </nav>
+        </div>
+      </div>
+
+      {/* HERO SECTION WITH PEARL GRAY LENS */}
+      <section className="relative h-screen flex items-center justify-center overflow-hidden bg-[#e8e8e8]">
+        <div className="absolute inset-0 bg-cover bg-center mix-blend-overlay opacity-40" style={{ backgroundImage: `url(${HERO_IMAGE})` }} />
+        
+        {/* DISTINGUISHABLE PEARL LENS */}
+        <div className="absolute inset-0 z-0 pointer-events-none transition-opacity duration-500 flex items-center justify-center" style={{ opacity: lensOpacity }}>
+          <div className="absolute w-[130vw] h-[130vw] bg-[radial-gradient(circle_at_center,_#FFFFFF_0%,_#F5F5F5_20%,_#E5E4E2_40%,_#D1D1D1_60%,_transparent_80%)] shadow-inner" />
+        </div>
+
+        <div className="relative z-10 text-center space-y-6">
+          <p className="text-[11px] uppercase tracking-[1.2em] font-bold text-black opacity-70 animate-fade-in">Maison Collection</p>
+          <h1 className="text-5xl md:text-[9rem] font-light tracking-tighter uppercase text-black leading-none select-none animate-slide-up">
+            {activeCategory === 'All' ? 'Season' : activeCategory}
+          </h1>
+        </div>
+      </section>
+
+      {/* CONTENT AREA */}
+      <main className="max-w-[1800px] mx-auto px-6 md:px-12 py-32 min-h-[60vh] flex flex-col justify-center">
+        
+        {activeCategory === "Custom Made Hampers" ? (
+          /* ONLY ONE BUTTON - NO COLUMNS */
+          <div className="flex flex-col items-center justify-center space-y-12 animate-fade-up">
+            <div className="text-center space-y-6 max-w-2xl">
+              <h2 className="text-4xl font-light tracking-tighter uppercase">Tailored Perfection</h2>
+              <p className="text-stone-500 text-sm tracking-widest leading-loose uppercase">
+                Discover the art of bespoke gifting. Each hamper is uniquely curated to reflect your aesthetic and occasion.
+              </p>
+            </div>
+            <button 
+              onClick={handleInquiryEmail}
+              className="bg-black text-white px-12 py-6 text-[11px] tracking-[0.4em] font-bold uppercase flex items-center gap-4 hover:bg-stone-800 transition-all shadow-2xl transform hover:scale-105 active:scale-95"
+            >
+              <Mail className="w-5 h-5" /> Contact for Custom Made Hampers
+            </button>
+          </div>
+        ) : (
+          /* PRODUCT GRID FOR OTHER CATEGORIES */
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-x-12 gap-y-28">
+            {displayProducts.map((p) => (
+              <div key={p.id} className="group cursor-pointer animate-fade-up">
+                <div className="relative aspect-[4/5] bg-stone-100 overflow-hidden mb-8 transition-all duration-700 group-hover:shadow-xl">
+                  <img src={p.img} alt={p.name} className="w-full h-full object-cover transition-all duration-[1s] group-hover:scale-110" />
+                </div>
+                <div className="text-center space-y-2">
+                  <h3 className="text-[11px] uppercase tracking-[0.4em] font-bold text-black">{p.name}</h3>
+                  <p className="text-[12px] font-sans text-stone-400 tracking-widest uppercase">₹{p.price.toLocaleString('en-IN')}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </main>
+
+      <footer className="bg-white py-32 px-10 border-t border-stone-100 text-center">
+        <div className="text-3xl md:text-5xl tracking-[0.8em] font-light uppercase mb-8">{STORE_NAME}</div>
+        <p className="text-[10px] tracking-[0.5em] text-stone-300 uppercase">© 2024 Private Atelier</p>
+      </footer>
+
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&display=swap');
+        .font-serif { font-family: 'Playfair Display', serif; }
+        @keyframes fade-in { from { opacity: 0; } to { opacity: 0.7; } }
+        @keyframes slide-up { from { opacity: 0; transform: translateY(50px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fade-up { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-fade-in { animation: fade-in 2.5s ease-out forwards; }
+        .animate-slide-up { animation: slide-up 1.5s cubic-bezier(0.19, 1, 0.22, 1) forwards; }
+        .animate-fade-up { animation: fade-up 1s cubic-bezier(0.19, 1, 0.22, 1) forwards; }
+        ::-webkit-scrollbar { width: 3px; }
+        ::-webkit-scrollbar-thumb { background: #000; }
+      `}</style>
+    </div>
+  );
+};
+
+export default App;
